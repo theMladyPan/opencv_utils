@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(getAndUpdateImage()));
-    timer->start(20);
+    timer->start(50);
 
     ui->setupUi(this);
     ui->tabMeasure->setEnabled(false);
@@ -74,10 +74,7 @@ void MainWindow::showMessage(const string &message)
 void MainWindow::updateSetupCameraImage()
 {
     Mat outArr(*_pLastCvMat);
-    if(_scale!=1.0){
-        cv::resize(outArr, outArr, cv::Size(), _scale, _scale, cv::INTER_CUBIC);
-    }
-    *_pLastQImage = QImage((const unsigned char*)(outArr.data), outArr.cols, outArr.rows, QImage::Format_Grayscale8);
+    *_pLastQImage = QImage((const unsigned char*)(outArr.data), outArr.cols, outArr.rows, QImage::Format_Grayscale8).scaledToWidth(outArr.cols*_scale);
     ui->labelImageSetupCamera->resize(outArr.cols, outArr.rows);
     ui->labelImageSetupCamera->setPixmap(QPixmap::fromImage(*_pLastQImage));
 }
@@ -95,11 +92,7 @@ void MainWindow::updateSetupThresholdImage()
         rectangle(outArr, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100), 3, LINE_AA);
     }
 
-    if(_scale!=1.0){
-        cv::resize(outArr, outArr, cv::Size(), _scale, _scale, cv::INTER_CUBIC);
-    }
-
-    *_pLastQImage = QImage((const unsigned char*)(outArr.data), outArr.cols, outArr.rows, QImage::Format_Grayscale8);
+    *_pLastQImage = QImage((const unsigned char*)(outArr.data), outArr.cols, outArr.rows, QImage::Format_Grayscale8).scaledToWidth(outArr.cols*_scale);
     ui->labelImageSetupThreshold->resize(outArr.cols, outArr.rows);
     ui->labelImageSetupThreshold->setPixmap(QPixmap::fromImage(*_pLastQImage));
 }
@@ -112,10 +105,13 @@ void MainWindow::updateMeasureImage()
         Mat imatcolor = Mat(outArr.rows, outArr.cols, CV_8UC3);
 
         ApplyThreshold(outArr);
-
         ApplyGrid(outArr);
-        copyMakeBorder(outArr, outArr, 1, 1, 1, 1, BORDER_CONSTANT, 255);
-        copyMakeBorder(imatcolor, imatcolor, 1, 1, 1, 1, BORDER_CONSTANT, 255);
+        rectangle(outArr, Rect(0,0, imatcolor.cols, imatcolor.rows), Scalar(255));
+
+        rectangle(outArr, Rect(0,0, outArr.cols/4, outArr.rows), Scalar(255), FILLED);
+        rectangle(outArr, Rect(0,0, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
+        rectangle(outArr, Rect(outArr.cols*3/4,0, outArr.cols, outArr.rows), Scalar(255), FILLED);
+        rectangle(outArr, Rect(0,outArr.rows*3/4, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
 
         vector<contour> contours;
         vector<Vec4i> hierarchy;
@@ -130,11 +126,9 @@ void MainWindow::updateMeasureImage()
 
         _message.str(string());
         _message << largeContours.size();
-        ui->editLinesFound->clear();
-        ui->editLinesFound->setText(QString::fromStdString(_message.str()));
+        ui->editBlobsFound->setText(QString::fromStdString(_message.str()));
 
         cvtColor(outArr, imatcolor,COLOR_GRAY2RGB);
-        drawColorContours(imatcolor, largeContours, hierarchy);
 
         // get minimal size rectangles
         vector<float> widths;
@@ -142,6 +136,10 @@ void MainWindow::updateMeasureImage()
         for(auto contour: largeContours) {
             rectangles.push_back(minAreaRect(contour));
         }
+
+        // TODO: Add weighed...
+
+        drawColorContours(imatcolor, largeContours, hierarchy);
         // Draw rectangles
         for(auto rectangle:rectangles){
             Point2f rect_points[4]; rectangle.points( rect_points );
@@ -162,17 +160,14 @@ void MainWindow::updateMeasureImage()
             n++;
         }
         avgWidth = avgWidth / n;
-        _message.str(string());
-        _message<<avgWidth<<" pix";
-        ui->editAvgLineWidth->clear();
-        ui->editAvgLineWidth->setText(QString::fromStdString(_message.str()));
 
-        if(_scale!=1.0){
-            cv::resize(imatcolor, imatcolor, cv::Size(), _scale, _scale, cv::INTER_CUBIC);
-        }
-        *_pLastQImage = QImage((const unsigned char*)(imatcolor.data), imatcolor.cols, imatcolor.rows, QImage::Format_RGB888);
+        _message.str(string());
+        _message << avgWidth;
+        ui->editAvgWidth->setText(QString::fromStdString(_message.str()));
+
+        auto lQImage = QImage((const unsigned char*)(imatcolor.data), imatcolor.cols, imatcolor.rows, QImage::Format_RGB888).scaledToWidth(imatcolor.cols*_scale);
         ui->labelMeasure->resize(imatcolor.cols, imatcolor.rows);
-        ui->labelMeasure->setPixmap(QPixmap::fromImage(*_pLastQImage));
+        ui->labelMeasure->setPixmap(QPixmap::fromImage(lQImage));
         _updateNeeded = false;
     }
 
@@ -313,10 +308,10 @@ void MainWindow::on_actionDisconnect_triggered()
 
 void MainWindow::on_action_Zoom_in_triggered()
 {
-    _scale *= 2;
+    _scale *= 1.2;
 }
 
 void MainWindow::on_actionZoom_Out_triggered()
 {
-    _scale /= 2;
+    _scale /= 1.2;
 }

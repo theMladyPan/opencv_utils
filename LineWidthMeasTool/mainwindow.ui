@@ -492,38 +492,10 @@
         <string>Measure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="5">
-         <widget class="QLineEdit" name="editInaccuracy">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4">
+        <item row="2" column="4">
          <widget class="QLabel" name="labelInaccuracy">
           <property name="text">
            <string>Inaccuracy</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Measured average width</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="editAvgLineWidth">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="labelLinesFound">
-          <property name="text">
-           <string>Lines found</string>
           </property>
          </widget>
         </item>
@@ -543,10 +515,56 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QLineEdit" name="editLinesFound">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Measured average width</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="labelLinesFound">
+          <property name="text">
+           <string>Blobs Found</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QLineEdit" name="editInaccuracy">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="font">
+           <font>
+            <family>DejaVu Sans Mono</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="editAvgWidth">
+          <property name="font">
+           <font>
+            <family>DejaVu Sans Mono</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLineEdit" name="editBlobsFound">
+          <property name="font">
+           <font>
+            <family>DejaVu Sans Mono</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
          </widget>
         </item>
