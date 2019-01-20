@@ -37,7 +37,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     grabber.cpp \
-    grabber.h \
     tools.cpp
 
 HEADERS += \

@@ -22,7 +22,7 @@ public:
   Grabber(uint8_t index);
 
   /// Construct Grabber with first camera available
-  Grabber() : Grabber(0){};
+  Grabber();
 
   /// Construct Grabber with pCamera
   Grabber(CameraPtr pCamera);

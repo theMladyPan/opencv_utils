@@ -14,64 +14,75 @@ Grabber::Grabber(uint8_t index)
   camList.Clear();
 }
 
+Grabber::Grabber()
+{
+
+}
+
 Grabber::Grabber(CameraPtr pCamera)
 {
-  pCam = pCamera;
+    pCam = pCamera;
 }
 
 Grabber::Grabber(string serialNr)
 {
-  pSystem = System::GetInstance();
-  CameraList camList = pSystem->GetCameras();
-  pCam = camList.GetBySerial(serialNr);
+    pSystem = System::GetInstance();
+    CameraList camList = pSystem->GetCameras();
+    pCam = camList.GetBySerial(serialNr);
 }
 
 Grabber::~Grabber()
 {
-  this->free();
+    this->free();
 }
 
 void Grabber::init()
 {
-  this->init(AcquisitionMode_Continuous);
+    this->init(AcquisitionMode_Continuous);
 }
 
 void Grabber::init(AcquisitionModeEnums modeEnum)
 {
-  pCam->Init();
-  INodeMap &nodeMap = pCam->GetNodeMap();
-  CEnumerationPtr ptrAcquisitionMode = nodeMap.GetNode("AcquisitionMode");
-  int64_t acquisitionMode ;
-  switch (modeEnum) {
-    case AcquisitionMode_Continuous:{
-       acquisitionMode = ptrAcquisitionMode->GetEntryByName("Continuous")->GetValue();
-       break;
-    }
-    case AcquisitionMode_SingleFrame:{
-      acquisitionMode = ptrAcquisitionMode->GetEntryByName("SingleFrame")->GetValue();
-      break;
-    }
-    case AcquisitionMode_MultiFrame:{
-      acquisitionMode = ptrAcquisitionMode->GetEntryByName("MultiFrame")->GetValue();
-      break;
-    }
-    default:{
-      acquisitionMode = ptrAcquisitionMode->GetEntryByName("Continuous")->GetValue();
-      }
+    pCam->Init();
+    INodeMap &nodeMap = pCam->GetNodeMap();
+    CEnumerationPtr ptrAcquisitionMode = nodeMap.GetNode("AcquisitionMode");
+    int64_t acquisitionMode ;
+    switch (modeEnum) {
+        case AcquisitionMode_Continuous:{
+           acquisitionMode = ptrAcquisitionMode->GetEntryByName("Continuous")->GetValue();
+           break;
+        }
+        case AcquisitionMode_SingleFrame:{
+          acquisitionMode = ptrAcquisitionMode->GetEntryByName("SingleFrame")->GetValue();
+          break;
+        }
+        case AcquisitionMode_MultiFrame:{
+          acquisitionMode = ptrAcquisitionMode->GetEntryByName("MultiFrame")->GetValue();
+          break;
+        }
+        default:{
+          acquisitionMode = ptrAcquisitionMode->GetEntryByName("Continuous")->GetValue();
+          }
 
-    }
+        }
 
-  ptrAcquisitionMode->SetIntValue(acquisitionMode);
+    ptrAcquisitionMode->SetIntValue(acquisitionMode);
 }
 
 void Grabber::start(){
   // TODO: rewrite for single shot
-  pCam->BeginAcquisition();
+    if(!pCam->IsInitialized()){
+        this->init();
+    }
+
+    if(!pCam->IsStreaming()){
+        pCam->BeginAcquisition();
+    }
 }
 
 void Grabber::stop()
 {
-  pCam->EndAcquisition();
+    pCam->EndAcquisition();
 }
 
 string Grabber::getSerialNr(){
@@ -117,13 +128,20 @@ void Grabber::saveLast(string filename)
 
 void Grabber::free()
 {
-  pCam->EndAcquisition();
-  pCam = nullptr;
-  if(pSystem != nullptr){
-    if(pSystem->IsInUse()){
-      pSystem->ReleaseInstance();
-      }
-  }
+    if(pCam != nullptr){;
+        try{
+            this->stop();
+        }catch (Spinnaker:: Exception &e){
+            std::cerr<<e.GetErrorMessage();
+        }
+        pCam->DeInit();
+        pCam = nullptr;
+    }
+    /* if(pSystem != nullptr){
+      if(pSystem->IsInUse()){
+        pSystem->ReleaseInstance();
+        }
+    }*/
 }
 
 uint8_t nOfCamAvail()
@@ -142,10 +160,13 @@ uint8_t nOfCamAvail()
 vector<string> camAvail()
 {
   vector<string> cameras;
-  for(uint8_t i=0; i<nOfCamAvail();i++){
-      Grabber grb = Grabber(i);
-      cameras.push_back(grb.getSerialNr());
-      grb.free();
-    }
+  int availCameras = nOfCamAvail();
+  if(availCameras>0){
+      for(uint8_t i=0; i<availCameras;i++){
+          Grabber grb = Grabber(i);
+          cameras.push_back(grb.getSerialNr());
+        }
+  }
+
   return cameras;
 }
