@@ -82,7 +82,11 @@ void Grabber::start(){
 
 void Grabber::stop()
 {
-    pCam->EndAcquisition();
+    if(pCam!= nullptr){
+        if(pCam->IsStreaming()){
+            pCam->EndAcquisition();
+        }
+    }
 }
 
 string Grabber::getSerialNr(){
@@ -128,7 +132,7 @@ void Grabber::saveLast(string filename)
 
 void Grabber::free()
 {
-    if(pCam != nullptr){;
+    if(pCam != nullptr){
         try{
             this->stop();
         }catch (Spinnaker:: Exception &e){

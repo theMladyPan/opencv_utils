@@ -2,8 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/features2d.hpp>
 #include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
 #include <iostream>
 #include "grabber.h"
 #include <qstring.h>
@@ -46,15 +49,29 @@ private slots:
 
     void on_actionRefresh_triggered();
 
+    void on_buttonStart_clicked();
+
+    void on_actionConnect_triggered();
+
+    void on_actionDisconnect_triggered();
+
+    void on_action_Zoom_in_triggered();
+
+    void on_actionZoom_Out_triggered();
+
 private:
     Ui::MainWindow *ui;
     stringstream _message;
     int _camAvail = 0;
     bool _connected = false;
+    bool _grab = false;
+    bool _updateNeeded = false;
     Grabber _Grabber;
     ImagePtr _pLastImage = nullptr;
     cv::Mat *_pLastCvMat = new Mat();
     QImage *_pLastQImage = new QImage();
+    double _scale = 1;
+    Color *_pColor = new Color();
 
     int _threshMethod = 0;
     int _threshType = 0;
@@ -64,6 +81,8 @@ private:
     void updateSetupCameraImage();
     void updateSetupThresholdImage();
     void updateMeasureImage();
+    void ApplyThreshold(Mat &outArr);
+    void ApplyGrid(Mat &outArr, const Scalar color=Scalar(255));
 };
 
 

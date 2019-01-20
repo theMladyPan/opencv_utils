@@ -74,7 +74,58 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelCameraInfo">
+             <property name="text">
+              <string>Camera status</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QComboBox" name="comboBoxCameraList">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>3</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <item>
+              <property name="text">
+               <string> - </string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="QPushButton" name="buttonStart">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Start</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="3">
+            <widget class="QPushButton" name="buttonRefresh">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
             <widget class="QPushButton" name="buttonConnect">
              <property name="enabled">
               <bool>false</bool>
@@ -90,52 +141,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="buttonRefresh">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>1</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Refresh</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="comboBoxCameraList">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>3</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <item>
-              <property name="text">
-               <string> - </string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelCameraInfo">
-             <property name="text">
-              <string>Camera info</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <widget class="QPushButton" name="buttonStart">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Start</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="4">
+           <item row="1" column="2">
             <widget class="QLineEdit" name="editCameraInfo">
              <property name="enabled">
               <bool>false</bool>
@@ -148,7 +154,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0" colspan="5">
+           <item row="1" column="3" colspan="3">
             <widget class="QProgressBar" name="progressBarSetupCamera">
              <property name="value">
               <number>0</number>
@@ -185,7 +191,10 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>TextLabel</string>
+              <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>
@@ -238,12 +247,12 @@
              </property>
              <item>
               <property name="text">
-               <string>Inverted (white on dark background)</string>
+               <string>Normal (dark on light background)</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Normal (dark on light background)</string>
+               <string>Inverted (white on dark background)</string>
               </property>
              </item>
             </widget>
@@ -391,6 +400,51 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="labelMinContourArea">
+                <property name="text">
+                 <string>Minimal Blob size</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBoxBlobSize">
+                <property name="minimum">
+                 <number>10</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="horizontalSliderBlobSize">
+                <property name="minimum">
+                 <number>10</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="pageStep">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -420,6 +474,9 @@
              <property name="text">
               <string>Image From Camera</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
             </widget>
            </item>
           </layout>
@@ -429,23 +486,23 @@
       </widget>
       <widget class="QWidget" name="tabMeasure">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <attribute name="title">
         <string>Measure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="2">
-         <widget class="QLabel" name="labelInaccuracy">
-          <property name="text">
-           <string>Inaccuracy</string>
+        <item row="1" column="5">
+         <widget class="QLineEdit" name="editInaccuracy">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="editLineWidth">
-          <property name="enabled">
-           <bool>false</bool>
+        <item row="1" column="4">
+         <widget class="QLabel" name="labelInaccuracy">
+          <property name="text">
+           <string>Inaccuracy</string>
           </property>
          </widget>
         </item>
@@ -456,14 +513,21 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QLineEdit" name="editInaccuracy">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="editAvgLineWidth">
           <property name="enabled">
            <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item row="0" column="0" colspan="4">
+        <item row="1" column="2">
+         <widget class="QLabel" name="labelLinesFound">
+          <property name="text">
+           <string>Lines found</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="6">
          <widget class="QLabel" name="labelMeasure">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -473,6 +537,16 @@
           </property>
           <property name="text">
            <string>Image goes here</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLineEdit" name="editLinesFound">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -493,7 +567,7 @@
    </property>
    <widget class="QMenu" name="menuCamera">
     <property name="title">
-     <string>Camera</string>
+     <string>&amp;Camera</string>
     </property>
     <addaction name="actionRefresh"/>
     <addaction name="separator"/>
@@ -505,7 +579,16 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="action_Zoom_in"/>
+    <addaction name="actionZoom_Out"/>
+    <addaction name="separator"/>
+   </widget>
    <addaction name="menuCamera"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -518,7 +601,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRefresh">
    <property name="text">
-    <string>Refresh</string>
+    <string>&amp;Refresh</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -529,7 +612,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Connect ...</string>
+    <string>Connect</string>
    </property>
   </action>
   <action name="actionDisconnect">
@@ -558,7 +641,23 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="action_Zoom_in">
+   <property name="text">
+    <string>Zoom &amp;In</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="text">
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="shortcut">
+    <string>-</string>
    </property>
   </action>
  </widget>
@@ -572,12 +671,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>275</y>
+     <x>215</x>
+     <y>229</y>
     </hint>
     <hint type="destinationlabel">
-     <x>182</x>
-     <y>305</y>
+     <x>215</x>
+     <y>259</y>
     </hint>
    </hints>
   </connection>
@@ -588,12 +687,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>261</x>
-     <y>305</y>
+     <x>270</x>
+     <y>259</y>
     </hint>
     <hint type="destinationlabel">
-     <x>261</x>
-     <y>275</y>
+     <x>270</x>
+     <y>229</y>
     </hint>
    </hints>
   </connection>
@@ -604,12 +703,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>186</x>
-     <y>437</y>
+     <x>219</x>
+     <y>344</y>
     </hint>
     <hint type="destinationlabel">
-     <x>186</x>
-     <y>407</y>
+     <x>219</x>
+     <y>314</y>
     </hint>
    </hints>
   </connection>
@@ -620,12 +719,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>231</x>
-     <y>407</y>
+     <x>264</x>
+     <y>314</y>
     </hint>
     <hint type="destinationlabel">
-     <x>231</x>
-     <y>437</y>
+     <x>264</x>
+     <y>344</y>
     </hint>
    </hints>
   </connection>
@@ -636,12 +735,44 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>601</y>
+     <x>190</x>
+     <y>515</y>
     </hint>
     <hint type="destinationlabel">
-     <x>153</x>
-     <y>536</y>
+     <x>186</x>
+     <y>409</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSliderBlobSize</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBoxBlobSize</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>645</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>120</x>
+     <y>627</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxBlobSize</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSliderBlobSize</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>214</x>
+     <y>621</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>213</x>
+     <y>648</y>
     </hint>
    </hints>
   </connection>

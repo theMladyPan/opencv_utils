@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++11
+CONFIG += c++14
 
 unix{
     INCLUDEPATH += /usr/local/include/opencv4
@@ -30,8 +30,9 @@ unix{
 
     INCLUDEPATH += /usr/include/spinnaker
     LIBS += -lSpinnaker
-}
 
+}
+message(LIBS)
 
 SOURCES += \
     main.cpp \
@@ -46,3 +47,4 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui
+
