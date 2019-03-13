@@ -59,7 +59,7 @@ int showCvMat(string name, Mat &inpArr, int delay_ms){
 void drawColorContours(const Mat &destArray, const vector<contour> &contours, const vector<Vec4i> &hierarchy){
     for( size_t i = 0; i< contours.size(); i++ )
     {
-        auto color = Color().randomColor();
+        auto color = Color().setup(150, 255).randomColor();
         drawContours( destArray, contours, (int)i, color, 1, LINE_AA, hierarchy, 0);
     }
 }

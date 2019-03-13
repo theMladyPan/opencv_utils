@@ -392,12 +392,18 @@
                 <property name="text">
                  <string>Show Grid</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxShowRoi">
                 <property name="text">
                  <string>Shor Region of Interrest (ROI)</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

@@ -107,24 +107,18 @@ void MainWindow::updateMeasureImage()
 {
     if(_updateNeeded){
         Mat outArr;
-        Mat originalOutArr;
+        Mat originalColor = Mat(outArr.rows, outArr.cols, CV_8UC3);
         _pLastCvMat->copyTo(outArr);
-        _pLastCvMat->copyTo(originalOutArr);
-        Mat imatcolor = Mat(outArr.rows, outArr.cols, CV_8UC3);
+        cvtColor(*_pLastCvMat, originalColor, COLOR_GRAY2RGB);
 
         ApplyThreshold(outArr);
-
-        // TODO: dat iba linajky pre meranie jednym smerom
         ApplyGrid(outArr);
-        rectangle(outArr, Rect(0,0, imatcolor.cols, imatcolor.rows), Scalar(255));
 
         rectangle(outArr, Rect(0,0, outArr.cols/4, outArr.rows), Scalar(255), FILLED);
         rectangle(outArr, Rect(0,0, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
         rectangle(outArr, Rect(outArr.cols*3/4,0, outArr.cols, outArr.rows), Scalar(255), FILLED);
         rectangle(outArr, Rect(0,outArr.rows*3/4, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
-
-
-        rectangle(outArr, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100), 3, LINE_AA);
+        rectangle(originalColor, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100, 200, 100), 3, LINE_AA);
 
         vector<contour> contours;
         vector<Vec4i> hierarchy;
@@ -141,8 +135,6 @@ void MainWindow::updateMeasureImage()
         _message << largeContours.size();
         ui->editBlobsFound->setText(QString::fromStdString(_message.str()));
 
-        cvtColor(outArr, imatcolor,COLOR_GRAY2RGB);
-
         // get minimal size rectangles
         vector<float> widths;
         vector<RotatedRect> rectangles;
@@ -150,20 +142,23 @@ void MainWindow::updateMeasureImage()
             rectangles.push_back(minAreaRect(contour));
         }
 
-
-        drawColorContours(imatcolor, largeContours, hierarchy);
+        drawColorContours(originalColor, largeContours, hierarchy);
         // Draw rectangles
+        _pColor->setup(0,50);
         for(auto rectangle:rectangles){
             Point2f rect_points[4]; rectangle.points( rect_points );
             auto randomColor = _pColor->randomColor();
             for( int j = 0; j < 4; j++ ){
-              line( imatcolor, rect_points[j], rect_points[(j+1)%4], randomColor, 1, LINE_AA );
+                line( originalColor, rect_points[j], rect_points[(j+1)%4], randomColor, 2, LINE_AA );
             }
             stringstream center;
-            int lesser(rectangle.size.width<rectangle.size.height?rectangle.size.width:rectangle.size.height);
+            float lesser(rectangle.size.width<rectangle.size.height?rectangle.size.width:rectangle.size.height);
+
+            // convert pixels into mm, keep 2 decimals
+            lesser = trunc(100*lesser/41.5) / 100;
             widths.push_back(lesser);
-            center<<lesser<<"pix";
-            putText(imatcolor, center.str(), rectangle.center, FONT_HERSHEY_COMPLEX, 1, randomColor, 1, LINE_AA);
+            center<<lesser<<"mm";
+            putText(originalColor, center.str(), rectangle.center, FONT_HERSHEY_COMPLEX, 1.5, randomColor, 2, LINE_AA);
         }
         float avgWidth = 0;
         int n=0;
@@ -172,18 +167,21 @@ void MainWindow::updateMeasureImage()
             n++;
         }
         avgWidth = avgWidth / n;
+        if(_avgWidth<0 or _avgWidth!= _avgWidth){
+            _avgWidth = 0;
+        }
+        if(_avgWidth==0){
+            _avgWidth = avgWidth;
+        }else{
+            _avgWidth = (_avgWidth * 0.9) + (avgWidth * 0.1);
+        }
 
-        _message.str(string());
-        _message << avgWidth;
+        _message.str("");
+        _message << _avgWidth;
         ui->editAvgWidth->setText(QString::fromStdString(_message.str()));
+        auto lQImage = QImage((const unsigned char*)(originalColor.data), originalColor.cols, originalColor.rows, QImage::Format_RGB888).scaledToWidth(originalColor.cols*_scale);
 
-        cvtColor(originalOutArr, originalOutArr,COLOR_GRAY2RGB);
-        // subtract(outArr, imatcolor, imatcolor);
-        cv::addWeighted(originalOutArr, 0.5, imatcolor, 0.5, 1, imatcolor);
-
-        auto lQImage = QImage((const unsigned char*)(imatcolor.data), imatcolor.cols, imatcolor.rows, QImage::Format_RGB888).scaledToWidth(imatcolor.cols*_scale);
-
-        ui->labelMeasure->resize(imatcolor.cols, imatcolor.rows);
+        ui->labelMeasure->resize(originalColor.cols, originalColor.rows);
         ui->labelMeasure->setPixmap(QPixmap::fromImage(lQImage));
         _updateNeeded = false;
     }else{
@@ -239,7 +237,7 @@ void MainWindow::getAndUpdateImage()
         Mat loaded = imread(_FileCamera.getNextFile());
 
         cvtColor(loaded, *_pLastCvMat, COLOR_RGB2GRAY);
-        this_thread::sleep_for(chrono::milliseconds(20));
+        this_thread::sleep_for(chrono::milliseconds(30));
         _updateNeeded = true;
     }else{
         if(_connected){

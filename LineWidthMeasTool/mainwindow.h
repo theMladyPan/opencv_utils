@@ -18,6 +18,7 @@
 #include <chrono>
 #include <QTimer>
 #include <QFileDialog>
+#include <cmath>
 
 using namespace std;
 using namespace cv;
@@ -80,6 +81,7 @@ private:
     Color *_pColor = new Color();
     vector<FileCamera> _FileCameras;
     FileCamera _FileCamera;
+    float _avgWidth = 0;
 
 
     int _threshMethod = 0;
