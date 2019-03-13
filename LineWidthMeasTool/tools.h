@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <Spinnaker.h>
 #include <opencv2/opencv.hpp>
+#include <QDir>
 
 #define COLOR_WHITE     16777215
 #define COLOR_BLUE      16711680
@@ -59,6 +60,19 @@ class Color{
      * @return Scalar with desired color
      */
     Scalar getColor(const int color);
+};
+
+class FileCamera{
+    private:
+        QString name;
+        QString directory;
+        vector<string> _filesInDir;
+        QStringList _imagesInDir ;
+    public:
+        FileCamera(){};
+        FileCamera(const string name);
+        string getName();
+        string getNextFile();
 };
 
 int showCvMat(string name, Mat &inpArr, int delay_ms=0);

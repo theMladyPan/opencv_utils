@@ -17,6 +17,7 @@
 #include <Spinnaker.h>
 #include <chrono>
 #include <QTimer>
+#include <QFileDialog>
 
 using namespace std;
 using namespace cv;
@@ -59,10 +60,15 @@ private slots:
 
     void on_actionZoom_Out_triggered();
 
+    void on_actionOpen_triggered();
+
+    void on_actionStart_triggered();
+
 private:
     Ui::MainWindow *ui;
     stringstream _message;
     int _camAvail = 0;
+    bool _usingVirtual = false;
     bool _connected = false;
     bool _grab = false;
     bool _updateNeeded = false;
@@ -72,6 +78,9 @@ private:
     QImage *_pLastQImage = new QImage();
     double _scale = 1;
     Color *_pColor = new Color();
+    vector<FileCamera> _FileCameras;
+    FileCamera _FileCamera;
+
 
     int _threshMethod = 0;
     int _threshType = 0;
@@ -83,6 +92,7 @@ private:
     void updateMeasureImage();
     void ApplyThreshold(Mat &outArr);
     void ApplyGrid(Mat &outArr, const Scalar color=Scalar(255));
+    void RefreshButtons();
 };
 
 

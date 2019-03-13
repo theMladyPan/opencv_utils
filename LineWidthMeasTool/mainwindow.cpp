@@ -32,6 +32,7 @@ void MainWindow::on_buttonRefresh_clicked()
     _message << "Reloading camera list...";
     showMessage(_message);
     _camAvail = nOfCamAvail();
+    _camAvail+=_FileCameras.size();
     ui->progressBarSetupCamera->setValue(10);
     _message.str(string());
     _message << "Number of cameras found: " << _camAvail<<", updating list...";
@@ -40,21 +41,26 @@ void MainWindow::on_buttonRefresh_clicked()
     _message << "Available cameras ("<<_camAvail<<")";
     ui->labelAvailableCameras->setText(QString::fromStdString(_message.str()));
 
+    ui->comboBoxCameraList->clear();
     if(_camAvail>0){
         // some cameras were found
-        vector<string> camList = camAvail();
+        vector<string> camListAvailable = camAvail();
+        vector<string> camList;
+        for(auto FileCamera:_FileCameras){
+            camList.push_back("VIRTUAL-"+FileCamera.getName());
+        }
+        for(auto cam:camListAvailable){
+            camList.push_back(cam);
+        }
         ui->progressBarSetupCamera->setValue(33);
         auto qCamList = getQStringList(camList);
-        ui->comboBoxCameraList->clear();
         ui->comboBoxCameraList->insertItems(0, qCamList);
-        ui->buttonConnect->setEnabled(true);
-        ui->actionConnect->setEnabled(true);
     }else{
-        ui->comboBoxCameraList->clear();
         ui->comboBoxCameraList->insertItem(0, QString::fromStdString(" - "));
-        ui->buttonConnect->setEnabled(false);
-        ui->actionConnect->setEnabled(false);
     }
+
+    RefreshButtons();
+
     ui->progressBarSetupCamera->setValue(50);
     showMessage("List updated");
     ui->tabCameraSetup->setEnabled(true);
@@ -101,10 +107,14 @@ void MainWindow::updateMeasureImage()
 {
     if(_updateNeeded){
         Mat outArr;
+        Mat originalOutArr;
         _pLastCvMat->copyTo(outArr);
+        _pLastCvMat->copyTo(originalOutArr);
         Mat imatcolor = Mat(outArr.rows, outArr.cols, CV_8UC3);
 
         ApplyThreshold(outArr);
+
+        // TODO: dat iba linajky pre meranie jednym smerom
         ApplyGrid(outArr);
         rectangle(outArr, Rect(0,0, imatcolor.cols, imatcolor.rows), Scalar(255));
 
@@ -112,6 +122,9 @@ void MainWindow::updateMeasureImage()
         rectangle(outArr, Rect(0,0, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
         rectangle(outArr, Rect(outArr.cols*3/4,0, outArr.cols, outArr.rows), Scalar(255), FILLED);
         rectangle(outArr, Rect(0,outArr.rows*3/4, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
+
+
+        rectangle(outArr, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100), 3, LINE_AA);
 
         vector<contour> contours;
         vector<Vec4i> hierarchy;
@@ -137,7 +150,6 @@ void MainWindow::updateMeasureImage()
             rectangles.push_back(minAreaRect(contour));
         }
 
-        // TODO: Add weighed...
 
         drawColorContours(imatcolor, largeContours, hierarchy);
         // Draw rectangles
@@ -148,7 +160,7 @@ void MainWindow::updateMeasureImage()
               line( imatcolor, rect_points[j], rect_points[(j+1)%4], randomColor, 1, LINE_AA );
             }
             stringstream center;
-            float lesser(rectangle.size.width<rectangle.size.height?rectangle.size.width:rectangle.size.height);
+            int lesser(rectangle.size.width<rectangle.size.height?rectangle.size.width:rectangle.size.height);
             widths.push_back(lesser);
             center<<lesser<<"pix";
             putText(imatcolor, center.str(), rectangle.center, FONT_HERSHEY_COMPLEX, 1, randomColor, 1, LINE_AA);
@@ -165,12 +177,19 @@ void MainWindow::updateMeasureImage()
         _message << avgWidth;
         ui->editAvgWidth->setText(QString::fromStdString(_message.str()));
 
+        cvtColor(originalOutArr, originalOutArr,COLOR_GRAY2RGB);
+        // subtract(outArr, imatcolor, imatcolor);
+        cv::addWeighted(originalOutArr, 0.5, imatcolor, 0.5, 1, imatcolor);
+
         auto lQImage = QImage((const unsigned char*)(imatcolor.data), imatcolor.cols, imatcolor.rows, QImage::Format_RGB888).scaledToWidth(imatcolor.cols*_scale);
+
         ui->labelMeasure->resize(imatcolor.cols, imatcolor.rows);
         ui->labelMeasure->setPixmap(QPixmap::fromImage(lQImage));
         _updateNeeded = false;
+    }else{
+        // limit to 30 fps. sleep for 20ms.
+        this_thread::sleep_for(chrono::milliseconds(20));
     }
-
 }
 
 void MainWindow::ApplyThreshold(Mat &outArr)
@@ -197,34 +216,52 @@ void MainWindow::ApplyGrid(Mat &outArr, const Scalar color)
     for(int row=0; row<outArr.rows; row+=ui->dialGridSize->value()){
         line(outArr, Point(0,row), Point(outArr.cols, row), color, 2);
     }
-    for(int col=0; col<outArr.cols; col+=ui->dialGridSize->value()){
+    /*for(int col=0; col<outArr.cols; col+=ui->dialGridSize->value()){
         line(outArr, Point(col, 0), Point(col, outArr.rows), color, 2);
+    }*/
+}
+
+void MainWindow::RefreshButtons()
+{
+    if(_camAvail>0){
+        ui->buttonConnect->setEnabled(true);
+        ui->actionConnect->setEnabled(true);
+    }else{
+        ui->buttonConnect->setEnabled(false);
+        ui->actionConnect->setEnabled(false);
     }
 }
 
 void MainWindow::getAndUpdateImage()
 {
-    if(_connected){
-        if(_grab){
-            _Grabber.start();
-            _pLastImage = _Grabber.getResult();
-            while(_pLastImage->IsIncomplete()){
-                _pLastImage = _Grabber.getResult();
-            }
-            toCvArray(_pLastImage).copyTo(*_pLastCvMat);
-            _updateNeeded = true;
-        }else{
-            _Grabber.stop();
-        }
+    if(_usingVirtual && _grab){
+        // simulate grabbing an image
+        Mat loaded = imread(_FileCamera.getNextFile());
 
-        if(ui->tabCameraSetup->isVisible() and _grab)
-        {
-            updateSetupCameraImage();
-        }else if(ui->tabThreshSetup->isVisible()){
-            updateSetupThresholdImage();
-        }else if(ui->tabMeasure->isVisible()){
-            updateMeasureImage();
+        cvtColor(loaded, *_pLastCvMat, COLOR_RGB2GRAY);
+        this_thread::sleep_for(chrono::milliseconds(20));
+        _updateNeeded = true;
+    }else{
+        if(_connected){
+            if(_grab){
+                _Grabber.start();
+                _pLastImage = _Grabber.getResult();
+                while(_pLastImage->IsIncomplete()){
+                    _pLastImage = _Grabber.getResult();
+                }
+                toCvArray(_pLastImage).copyTo(*_pLastCvMat);
+                _updateNeeded = true;
+            }else{
+                _Grabber.stop();
+            }
         }
+    }
+    if(ui->tabCameraSetup->isVisible() and _grab){
+        updateSetupCameraImage();
+    }else if(ui->tabThreshSetup->isVisible()){
+        updateSetupThresholdImage();
+    }else if(ui->tabMeasure->isVisible()){
+        updateMeasureImage();
     }
 }
 
@@ -266,22 +303,35 @@ void MainWindow::on_buttonStart_clicked()
         _grab = true;
         showMessage("Acquisition started");
         ui->buttonStart->setText("Stop");
+        ui->buttonConnect->setEnabled(false);
         ui->progressBarSetupCamera->setValue(100);
     }else{
         _grab = false;
         showMessage("Acquisition stopped");
         ui->buttonStart->setText("Start");
+        ui->buttonConnect->setEnabled(true);
         ui->progressBarSetupCamera->setValue(70);
     }
 }
 
 void MainWindow::on_actionConnect_triggered()
 {
+
     ui->progressBarSetupCamera->setValue(70);
     string camSerial = ui->comboBoxCameraList->currentText().toStdString();
-    _Grabber = Grabber(camSerial);
-    _Grabber.init();
-    _connected = true;
+    // check if we are about to connect to virtual camera
+    if(camSerial.find("VIRTUAL")==string::npos){
+        _Grabber = Grabber(camSerial);
+        _Grabber.init();
+        _connected = true;
+        _usingVirtual = false;
+    }else{
+        _usingVirtual = true;
+        _FileCamera = _FileCameras.at(ui->comboBoxCameraList->currentIndex());
+        _message.str("");
+        _message<<"Using: " << _FileCamera.getName();
+        showMessage(_message);
+    }
 
     showMessage("Connected");
     ui->actionDisconnect->setEnabled(true);
@@ -314,4 +364,35 @@ void MainWindow::on_action_Zoom_in_triggered()
 void MainWindow::on_actionZoom_Out_triggered()
 {
     _scale /= 1.2;
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+    // fake camera from folder
+    QString dirWithPictures = QFileDialog::getExistingDirectory(this, tr("Select directory with pictures"));
+    _FileCameras.push_back(FileCamera(dirWithPictures.toStdString()));
+
+    ui->tabCameraSetup->setEnabled(false);
+
+    _camAvail += 1;
+
+    vector<string> camList;
+    for(auto FileCamera:_FileCameras){
+        camList.push_back("VIRTUAL-"+FileCamera.getName());
+    }
+    ui->progressBarSetupCamera->setValue(33);
+    auto qCamList = getQStringList(camList);
+
+    ui->comboBoxCameraList->insertItems(static_cast<int>(ui->comboBoxCameraList->size().height()), qCamList);
+
+    RefreshButtons();
+
+    ui->progressBarSetupCamera->setValue(50);
+    showMessage("List updated");
+    ui->tabCameraSetup->setEnabled(true);
+}
+
+void MainWindow::on_actionStart_triggered()
+{
+    on_buttonStart_clicked();
 }

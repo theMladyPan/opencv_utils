@@ -85,3 +85,27 @@ void filterContours(const vector<contour> &original, vector<contour> &filtered, 
           }
     }
 }
+
+FileCamera::FileCamera(const string name)
+{
+    this->name = QString::fromStdString( name.substr(name.rfind("/")+1, name.size() - name.rfind("/")-1));
+    this->directory = QString::fromStdString(name);
+}
+
+string FileCamera::getName()
+{
+    return name.toStdString();
+}
+
+string FileCamera::getNextFile()
+{
+    if(_imagesInDir.isEmpty()){
+        _imagesInDir = QDir(directory).entryList(QStringList("*.png"));
+    }
+    if(_imagesInDir.isEmpty()){
+        return "";
+    }
+    string toReturn = directory.toStdString() + "/" + _imagesInDir.last().toStdString();
+    _imagesInDir.pop_back();
+    return toReturn;
+}

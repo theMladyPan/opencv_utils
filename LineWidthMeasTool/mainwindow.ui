@@ -89,11 +89,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <item>
-              <property name="text">
-               <string> - </string>
-              </property>
-             </item>
+             <property name="currentText">
+              <string notr="true"/>
+             </property>
             </widget>
            </item>
            <item row="0" column="5">
@@ -348,10 +346,13 @@
                  <bool>false</bool>
                 </property>
                 <property name="minimum">
-                 <number>100</number>
+                 <number>50</number>
                 </property>
                 <property name="maximum">
                  <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
                 </property>
                </widget>
               </item>
@@ -367,7 +368,7 @@
                  </sizepolicy>
                 </property>
                 <property name="minimum">
-                 <number>100</number>
+                 <number>50</number>
                 </property>
                 <property name="maximum">
                  <number>1000</number>
@@ -546,6 +547,9 @@
         </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="editAvgWidth">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="font">
            <font>
             <family>DejaVu Sans Mono</family>
@@ -558,6 +562,9 @@
         </item>
         <item row="2" column="3">
          <widget class="QLineEdit" name="editBlobsFound">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="font">
            <font>
             <family>DejaVu Sans Mono</family>
@@ -592,6 +599,7 @@
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
+    <addaction name="actionStart"/>
     <addaction name="actionRecord"/>
     <addaction name="actionOpen"/>
     <addaction name="separator"/>
@@ -632,6 +640,9 @@
    <property name="text">
     <string>Connect</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Return</string>
+   </property>
   </action>
   <action name="actionDisconnect">
    <property name="enabled">
@@ -651,10 +662,13 @@
   </action>
   <action name="actionOpen">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionExit">
@@ -676,6 +690,19 @@
    </property>
    <property name="shortcut">
     <string>-</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save as</string>
+   </property>
+  </action>
+  <action name="actionStart">
+   <property name="text">
+    <string>Start</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Space</string>
    </property>
   </action>
  </widget>
