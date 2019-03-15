@@ -60,14 +60,14 @@ void drawColorContours(const Mat &destArray, const vector<contour> &contours, co
     for( size_t i = 0; i< contours.size(); i++ )
     {
         auto color = Color().setup(150, 255).randomColor();
-        drawContours( destArray, contours, (int)i, color, 1, LINE_AA, hierarchy, 0);
+        drawContours( destArray, contours, (int)i, color, 1, LINE_4, hierarchy, 0);
     }
 }
 
 void drawColorContours(const Mat &destArray, const vector<contour> &contours, const vector<Vec4i> &hierarchy, const Scalar color)
 {
     for( size_t i = 0; i< contours.size(); i++ ){
-        drawContours( destArray, contours, (int)i, color, 1, LINE_AA, hierarchy, 0);
+        drawContours( destArray, contours, (int)i, color, 1, LINE_4, hierarchy, 0);
     }
 }
 
@@ -108,4 +108,56 @@ string FileCamera::getNextFile()
     string toReturn = directory.toStdString() + "/" + _imagesInDir.last().toStdString();
     _imagesInDir.pop_back();
     return toReturn;
+}
+
+Saver::Saver(const string &destination)
+{
+    _destination = destination;
+}
+
+void Saver::setDestination(const string &dest)
+{
+    _destination = dest;
+}
+
+void Saver::saveRaw(const Mat &Arr)
+{
+    stringstream msg;
+    msg.str("");
+    msg << _destination<< "/" << "raw_" << setfill('0') << setw(5)<< ++_counter << ".png";
+    string text = msg.str();
+    // TODO Check if directory exists
+    imwrite(msg.str(), Arr);
+}
+
+void Saver::saveGui(const Mat &Arr)
+{
+    stringstream msg;
+    msg.str("");
+    msg << _destination<< "/" << "gui_" << setfill('0') << setw(5)<< _counter << ".png";
+
+    imwrite(msg.str(), Arr);
+}
+
+string Saver::getDestination()
+{
+    return _destination;
+}
+
+void stampMat(Mat &inOutArr, double width, double blobs, double stdDev)
+{
+    stringstream text;
+    int ratio = (stdDev*100 / width);
+    width =  trunc(1000*width) / 1000;
+    stdDev =  trunc(10000*stdDev) / 10000;
+    text.str("");
+    text << "Average width: " << width << "mm, s" << stdDev*1000 << "um (" << ratio << "%)";
+    putText(inOutArr, text.str(), Point(22,inOutArr.rows - 8),FONT_HERSHEY_COMPLEX, 1.5, Scalar(127,127,127),2, LINE_AA);
+    putText(inOutArr, text.str(), Point(20,inOutArr.rows - 10),FONT_HERSHEY_COMPLEX, 1.5, Scalar(0,0,0),2, LINE_AA);
+    putText(inOutArr, text.str(), Point(19,inOutArr.rows - 11),FONT_HERSHEY_COMPLEX, 1.5, Scalar(255,255,255),2, LINE_AA);
+    text.str("");
+    text<< "Blobs found: " << blobs;
+    putText(inOutArr, text.str(), Point(22,inOutArr.rows-68),FONT_HERSHEY_COMPLEX, 1.5, Scalar(127,127,127),2, LINE_AA);
+    putText(inOutArr, text.str(), Point(20,inOutArr.rows-70),FONT_HERSHEY_COMPLEX, 1.5, Scalar(0,0,0),2, LINE_AA);
+    putText(inOutArr, text.str(), Point(19,inOutArr.rows-71),FONT_HERSHEY_COMPLEX, 1.5, Scalar(255,255,255),2, LINE_AA);
 }

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <QObject>
 #include <QStringList>
 #include <Spinnaker.h>
 #include <opencv2/opencv.hpp>
@@ -69,10 +70,23 @@ class FileCamera{
         vector<string> _filesInDir;
         QStringList _imagesInDir ;
     public:
-        FileCamera(){};
+        FileCamera(){}
         FileCamera(const string name);
         string getName();
         string getNextFile();
+};
+
+class Saver{
+    private:
+        int _counter = 1;
+        string _destination = "~/Records";
+
+    public:
+        Saver(const string &destination);
+        void setDestination(const string &dest);
+        void saveRaw(const Mat &Arr);
+        void saveGui(const Mat &Arr);
+        string getDestination();
 };
 
 int showCvMat(string name, Mat &inpArr, int delay_ms=0);
@@ -86,6 +100,11 @@ void drawPointVector(Mat &image, const pointVector &points, const Scalar &color)
 void filterContours(const vector<contour> &original, vector<contour> &filtered, const long unsigned int minSize=0, const long unsigned int maxSize=INT32_MAX);
 
 QStringList getQStringList(const std::vector<std::string> &strVector);
+
 cv::Mat toCvArray(Spinnaker::ImagePtr image);
+
+void saveMat(Mat &Arr, string &destination);
+
+void stampMat(Mat &inOutArr, double width, double blobs, double stdDev);
 
 #endif // TOOLS_H

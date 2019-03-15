@@ -132,14 +132,18 @@ void Grabber::saveLast(string filename)
 
 void Grabber::free()
 {
-    if(pCam != nullptr){
-        try{
-            this->stop();
-        }catch (Spinnaker:: Exception &e){
-            std::cerr<<e.GetErrorMessage();
+    try{
+        if(pCam != nullptr){
+            try{
+                this->stop();
+            }catch (Spinnaker:: Exception &e){
+                std::cerr<<e.GetErrorMessage();
+            }
+            pCam->DeInit();
+            pCam = nullptr;
         }
-        pCam->DeInit();
-        pCam = nullptr;
+    }catch(int e){
+       // handle exception
     }
     /* if(pSystem != nullptr){
       if(pSystem->IsInUse()){

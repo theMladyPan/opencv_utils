@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->tabMeasure->setEnabled(false);
     ui->tabThreshSetup->setEnabled(false);
+    ui->editDestination->setText(QString::fromStdString(_Saver.getDestination()));
 }
 
 MainWindow::~MainWindow()
@@ -109,6 +110,11 @@ void MainWindow::updateMeasureImage()
         Mat outArr;
         Mat originalColor = Mat(outArr.rows, outArr.cols, CV_8UC3);
         _pLastCvMat->copyTo(outArr);
+
+        if(_record){
+            _Saver.saveRaw(outArr);
+        }
+
         cvtColor(*_pLastCvMat, originalColor, COLOR_GRAY2RGB);
 
         ApplyThreshold(outArr);
@@ -118,7 +124,10 @@ void MainWindow::updateMeasureImage()
         rectangle(outArr, Rect(0,0, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
         rectangle(outArr, Rect(outArr.cols*3/4,0, outArr.cols, outArr.rows), Scalar(255), FILLED);
         rectangle(outArr, Rect(0,outArr.rows*3/4, outArr.cols, outArr.rows/4), Scalar(255), FILLED);
-        rectangle(originalColor, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100, 200, 100), 3, LINE_AA);
+
+        //rectangle(originalColor, Rect(outArr.cols/4+2, outArr.rows/4+2, outArr.cols/2+2, outArr.rows/2+2), Scalar(127, 127, 127), 3, LINE_AA);
+        rectangle(originalColor, Rect(outArr.cols/4+1, outArr.rows/4+1, outArr.cols/2+1, outArr.rows/2+1), Scalar(0, 0, 0), 3, LINE_AA);
+        rectangle(originalColor, Rect(outArr.cols/4, outArr.rows/4, outArr.cols/2, outArr.rows/2), Scalar(100, 255, 100), 3, LINE_AA);
 
         vector<contour> contours;
         vector<Vec4i> hierarchy;
@@ -126,10 +135,12 @@ void MainWindow::updateMeasureImage()
         vector<vector<Point>> largeContours;
 
         for(auto vec=contours.begin(); vec!=contours.end(); vec++){
-            if(vec->size() > static_cast<long unsigned int>(ui->spinBoxBlobSize->value())){ // replace this with tiddlitoddly
+            double contourSize = contourArea(*vec);
+            if(vec->size() > 4 && contourSize > static_cast<long unsigned int>(ui->spinBoxBlobSize->value())){ // replace this with tiddlitoddly
                 largeContours.push_back(*vec);
             }
         }
+        drawColorContours(originalColor, largeContours, hierarchy);
 
         _message.str(string());
         _message << largeContours.size();
@@ -137,28 +148,32 @@ void MainWindow::updateMeasureImage()
 
         // get minimal size rectangles
         vector<float> widths;
-        vector<RotatedRect> rectangles;
         for(auto contour: largeContours) {
-            rectangles.push_back(minAreaRect(contour));
-        }
-
-        drawColorContours(originalColor, largeContours, hierarchy);
-        // Draw rectangles
-        _pColor->setup(0,50);
-        for(auto rectangle:rectangles){
+            auto rectangle = minAreaRect(contour);
             Point2f rect_points[4]; rectangle.points( rect_points );
             auto randomColor = _pColor->randomColor();
             for( int j = 0; j < 4; j++ ){
-                line( originalColor, rect_points[j], rect_points[(j+1)%4], randomColor, 2, LINE_AA );
+                line( originalColor, Point(rect_points[j].x+1, rect_points[j].y+1), Point(rect_points[(j+1)%4].x+1, rect_points[(j+1)%4].y+1), Scalar(0,0,0), 2, LINE_AA);
+                line( originalColor, rect_points[j], rect_points[(j+1)%4], randomColor, 2, LINE_AA);
             }
             stringstream center;
             float lesser(rectangle.size.width<rectangle.size.height?rectangle.size.width:rectangle.size.height);
 
+            // get area of contour and rectangle
+            double areaContour = contourArea(contour);
+            double areaRectangle = rectangle.size.width * rectangle.size.height;
+            double ratio = areaContour / areaRectangle;
+
+            // calculate relative part of width acc. to ratio of areas
+            lesser = lesser * ratio;
             // convert pixels into mm, keep 2 decimals
-            lesser = trunc(100*lesser/41.5) / 100;
+            lesser = trunc(100*lesser/(_calibrationConstant * _calibrationFine)) / 100;
+
             widths.push_back(lesser);
             center<<lesser<<"mm";
+            putText(originalColor, center.str(), Point(rectangle.center.x+1, rectangle.center.y+1), FONT_HERSHEY_COMPLEX, 1.5, Scalar(0,0,0), 2, LINE_AA);
             putText(originalColor, center.str(), rectangle.center, FONT_HERSHEY_COMPLEX, 1.5, randomColor, 2, LINE_AA);
+
         }
         float avgWidth = 0;
         int n=0;
@@ -175,18 +190,64 @@ void MainWindow::updateMeasureImage()
         }else{
             _avgWidth = (_avgWidth * 0.9) + (avgWidth * 0.1);
         }
-
         _message.str("");
-        _message << _avgWidth;
+        trunc(1000*_avgWidth)/1000;
+        _message << _avgWidth<<"mm";
         ui->editAvgWidth->setText(QString::fromStdString(_message.str()));
+
+        // calculate averge deviation
+        /***
+         * X=mean(xi), i=<1,n>
+         *
+         * sqrt( sum((xi-X)^2)/(n-1) )
+         *
+         */
+
+        vector<double> deviations;
+        for(auto width:widths){
+            deviations.push_back(avgWidth - width);
+        }
+
+        n=0;
+        double sumDev = 0;
+        double meanDeviation;
+        for(auto deviation:deviations){
+            sumDev += deviation;
+            n++;
+        }
+        meanDeviation = sumDev / n;
+
+        double sumSquaredPwrs = 0;
+        for(auto deviation:deviations){
+            sumSquaredPwrs += pow(deviation - meanDeviation, 2);;
+        }
+
+        double standardDev;
+        standardDev = sqrt( sumSquaredPwrs /n); // in mm
+
+        // write out to user
+        _message.str("");
+        _message << standardDev*1000 << "um";
+        ui->editInaccuracy->setText(QString::fromStdString(_message.str()));
+
+        // Put additional informations into picture
+        stampMat(originalColor, avgWidth, static_cast<double>(largeContours.size()), standardDev);
+
+        // if gui record enabled, save image with GUI.
+        if(_record && _recordGui){
+            _Saver.saveGui(originalColor);
+        }
+
+        //finally show the picture
         auto lQImage = QImage((const unsigned char*)(originalColor.data), originalColor.cols, originalColor.rows, QImage::Format_RGB888).scaledToWidth(originalColor.cols*_scale);
 
         ui->labelMeasure->resize(originalColor.cols, originalColor.rows);
         ui->labelMeasure->setPixmap(QPixmap::fromImage(lQImage));
         _updateNeeded = false;
+
     }else{
-        // limit to 30 fps. sleep for 20ms.
-        this_thread::sleep_for(chrono::milliseconds(20));
+        // limit to 33 fps. sleep for 30ms.
+        this_thread::sleep_for(chrono::milliseconds(30));
     }
 }
 
@@ -356,12 +417,12 @@ void MainWindow::on_actionDisconnect_triggered()
 
 void MainWindow::on_action_Zoom_in_triggered()
 {
-    _scale *= 1.2;
+    _scale *= 1.1;
 }
 
 void MainWindow::on_actionZoom_Out_triggered()
 {
-    _scale /= 1.2;
+    _scale /= 1.1;
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -393,4 +454,38 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionStart_triggered()
 {
     on_buttonStart_clicked();
+}
+
+void MainWindow::on_actionWith_GUI_triggered()
+{
+    _recordGui = ui->actionWith_GUI->isChecked();
+}
+
+void MainWindow::on_actionDestination_triggered()
+{
+    QString dirToSave = QFileDialog::getExistingDirectory(this, tr("Select directory where pictures will be saved"));
+    _Saver.setDestination(dirToSave.toStdString());
+    ui->editDestination->setText(dirToSave);
+}
+
+void MainWindow::on_actionRecord_triggered()
+{
+    _record = ui->actionRecord->isChecked();
+    auto text = QString();
+    if(_record){
+        text = QString("Measure 🔴");
+    }else{
+        text = QString("Measure");
+    }
+    ui->TabPane->setTabText(2, text);
+}
+
+void MainWindow::on_actionReset_triggered()
+{
+    _scale = 1;
+}
+
+void MainWindow::on_sliderFineCalibration_valueChanged(int value)
+{
+    _calibrationFine = value / 1000.0;
 }

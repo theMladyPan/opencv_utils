@@ -61,36 +61,16 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelAvailableCameras">
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="editCameraInfo">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>2</horstretch>
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Available cameras (0)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelCameraInfo">
-             <property name="text">
-              <string>Camera status</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QComboBox" name="comboBoxCameraList">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>3</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="currentText">
-              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -110,6 +90,19 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="3" colspan="3">
+            <widget class="QProgressBar" name="progressBarSetupCamera">
+             <property name="value">
+              <number>0</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="invertedAppearance">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="3">
             <widget class="QPushButton" name="buttonRefresh">
              <property name="sizePolicy">
@@ -120,6 +113,32 @@
              </property>
              <property name="text">
               <string>Refresh</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QComboBox" name="comboBoxCameraList">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>3</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="currentText">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelAvailableCameras">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>2</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Available cameras (0)</string>
              </property>
             </widget>
            </item>
@@ -139,28 +158,29 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QLineEdit" name="editCameraInfo">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelCameraInfo">
+             <property name="text">
+              <string>Camera status</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="3" colspan="3">
-            <widget class="QProgressBar" name="progressBarSetupCamera">
-             <property name="value">
-              <number>0</number>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Recording to</string>
              </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLineEdit" name="editDestination">
+             <property name="enabled">
+              <bool>true</bool>
              </property>
-             <property name="invertedAppearance">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="clearButtonEnabled">
               <bool>false</bool>
              </property>
             </widget>
@@ -321,6 +341,9 @@
                 <property name="maximum">
                  <number>255</number>
                 </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -330,6 +353,9 @@
                <widget class="QSpinBox" name="spinBoxOffset">
                 <property name="maximum">
                  <number>255</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
                 </property>
                </widget>
               </item>
@@ -420,13 +446,13 @@
                  <number>10</number>
                 </property>
                 <property name="maximum">
-                 <number>1000</number>
+                 <number>10000</number>
                 </property>
                 <property name="singleStep">
                  <number>10</number>
                 </property>
                 <property name="value">
-                 <number>100</number>
+                 <number>500</number>
                 </property>
                </widget>
               </item>
@@ -436,7 +462,7 @@
                  <number>10</number>
                 </property>
                 <property name="maximum">
-                 <number>1000</number>
+                 <number>10000</number>
                 </property>
                 <property name="singleStep">
                  <number>10</number>
@@ -445,7 +471,7 @@
                  <number>100</number>
                 </property>
                 <property name="value">
-                 <number>100</number>
+                 <number>500</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -499,14 +525,7 @@
         <string>Measure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="2" column="4">
-         <widget class="QLabel" name="labelInaccuracy">
-          <property name="text">
-           <string>Inaccuracy</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="6">
+        <item row="0" column="0" colspan="11">
          <widget class="QLabel" name="labelMeasure">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -536,25 +555,16 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="5">
-         <widget class="QLineEdit" name="editInaccuracy">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="font">
-           <font>
-            <family>DejaVu Sans Mono</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="editAvgWidth">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="font">
            <font>
@@ -563,13 +573,22 @@
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item row="2" column="3">
          <widget class="QLineEdit" name="editBlobsFound">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="font">
            <font>
@@ -578,6 +597,81 @@
             <weight>75</weight>
             <bold>true</bold>
            </font>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="7">
+         <widget class="QSlider" name="sliderFineCalibration">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>5</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <number>900</number>
+          </property>
+          <property name="maximum">
+           <number>1100</number>
+          </property>
+          <property name="value">
+           <number>1000</number>
+          </property>
+          <property name="sliderPosition">
+           <number>1000</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBothSides</enum>
+          </property>
+          <property name="tickInterval">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="labelInaccuracy">
+          <property name="text">
+           <string>Inaccuracy</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QLineEdit" name="editInaccuracy">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>DejaVu Sans Mono</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard deviation of found blobs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Calibration</string>
           </property>
          </widget>
         </item>
@@ -602,12 +696,15 @@
     </property>
     <addaction name="actionRefresh"/>
     <addaction name="separator"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionDestination"/>
+    <addaction name="separator"/>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
-    <addaction name="separator"/>
     <addaction name="actionStart"/>
+    <addaction name="separator"/>
     <addaction name="actionRecord"/>
-    <addaction name="actionOpen"/>
+    <addaction name="actionWith_GUI"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -618,6 +715,8 @@
     <addaction name="action_Zoom_in"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionReset"/>
    </widget>
    <addaction name="menuCamera"/>
    <addaction name="menuTools"/>
@@ -644,7 +743,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Connect</string>
+    <string>&amp;Connect</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Return</string>
@@ -655,15 +754,21 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Disconnect</string>
+    <string>&amp;Disconnect</string>
    </property>
   </action>
   <action name="actionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Record</string>
+    <string>&amp;Record</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
    </property>
   </action>
   <action name="actionOpen">
@@ -671,7 +776,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -680,6 +785,9 @@
   <action name="actionExit">
    <property name="text">
     <string>&amp;Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="action_Zoom_in">
@@ -698,17 +806,39 @@
     <string>-</string>
    </property>
   </action>
-  <action name="actionSave_as">
-   <property name="text">
-    <string>Save as</string>
-   </property>
-  </action>
   <action name="actionStart">
    <property name="text">
-    <string>Start</string>
+    <string>&amp;Start</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Space</string>
+   </property>
+  </action>
+  <action name="actionWith_GUI">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>With &amp;GUI</string>
+   </property>
+   <property name="toolTip">
+    <string>With GUI</string>
+   </property>
+   <property name="shortcut">
+    <string>G, Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionDestination">
+   <property name="text">
+    <string>&amp;Destination...</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
  </widget>

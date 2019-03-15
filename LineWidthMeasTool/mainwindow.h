@@ -19,6 +19,7 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 using namespace cv;
@@ -65,6 +66,16 @@ private slots:
 
     void on_actionStart_triggered();
 
+    void on_actionWith_GUI_triggered();
+
+    void on_actionDestination_triggered();
+
+    void on_actionRecord_triggered();
+
+    void on_actionReset_triggered();
+
+    void on_sliderFineCalibration_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     stringstream _message;
@@ -83,6 +94,12 @@ private:
     FileCamera _FileCamera;
     float _avgWidth = 0;
 
+    double _calibrationConstant = 45; // number of pixels per milimeter
+    double _calibrationFine = 1;
+
+    bool _record = false;
+    bool _recordGui = false;
+    Saver _Saver = Saver("~/Records");
 
     int _threshMethod = 0;
     int _threshType = 0;
