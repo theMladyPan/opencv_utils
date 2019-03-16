@@ -32,7 +32,8 @@ void MainWindow::on_buttonRefresh_clicked()
     _message.str("");
     _message << "Reloading camera list...";
     showMessage(_message);
-    _camAvail = nOfCamAvail();
+    int physicalCams = nOfCamAvail();
+    _camAvail = physicalCams;
     _camAvail+=_FileCameras.size();
     ui->progressBarSetupCamera->setValue(10);
     _message.str(string());
@@ -45,7 +46,10 @@ void MainWindow::on_buttonRefresh_clicked()
     ui->comboBoxCameraList->clear();
     if(_camAvail>0){
         // some cameras were found
-        vector<string> camListAvailable = camAvail();
+        vector<string> camListAvailable;
+        if(physicalCams>0){
+            camListAvailable= camAvail();
+        }
         vector<string> camList;
         for(auto FileCamera:_FileCameras){
             camList.push_back("VIRTUAL-"+FileCamera.getName());
@@ -191,7 +195,7 @@ void MainWindow::updateMeasureImage()
             _avgWidth = (_avgWidth * 0.9) + (avgWidth * 0.1);
         }
         _message.str("");
-        trunc(1000*_avgWidth)/1000;
+        _avgWidth = trunc(1000*_avgWidth)/1000;
         _message << _avgWidth<<"mm";
         ui->editAvgWidth->setText(QString::fromStdString(_message.str()));
 
@@ -224,10 +228,13 @@ void MainWindow::updateMeasureImage()
 
         double standardDev;
         standardDev = sqrt( sumSquaredPwrs /n); // in mm
+        int accuracy = 100 - (100*standardDev/_avgWidth);
+
+        ui->barAccuracy->setValue(accuracy);
 
         // write out to user
         _message.str("");
-        _message << standardDev*1000 << "um";
+        _message << trunc(standardDev*10000)/10 << "um";
         ui->editInaccuracy->setText(QString::fromStdString(_message.str()));
 
         // Put additional informations into picture
