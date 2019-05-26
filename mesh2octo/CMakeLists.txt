@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(PCL REQUIRED)
 
+# specify which version and components you need
+find_package(OGRE 1.11 REQUIRED COMPONENTS Bites RTShaderSystem)
+# copy resource.cfg next to our binaries where OGRE looks for it
+file(COPY ${OGRE_CONFIG_DIR}/resources.cfg DESTINATION ${CMAKE_BINARY_DIR})
 find_package(OpenCV REQUIRED)
 
 message(

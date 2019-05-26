@@ -1,5 +1,4 @@
 #include <iostream>
-#include <opencv2/opencv.hpp>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/vtk_lib_io.h>
 #include <pcl/pcl_base.h>
@@ -21,12 +20,7 @@ int main(int argc, char **argv)
     PolygonMesh mesh;
     string fileName(argv[1]);
 
-    if(fileName.find(".stl") == string::npos && fileName.find(".STL") == string::npos){
-        // TODO - toto zaiste dokončiť poriadne
-        io::loadPolygonFilePLY(fileName, mesh);
-    }else{
-        io::loadPolygonFileSTL(fileName, mesh);
-    }
+    io::loadPolygonFile(fileName, mesh); //based on mesh file extension
 
     PointCloud<PointXYZ>::Ptr ptrPcl(new PointCloud<PointXYZ>);
     PointCloud<PointXYZ>::Ptr pSampled(new PointCloud<PointXYZ>);
@@ -35,10 +29,11 @@ int main(int argc, char **argv)
 
     subsamplePcl(mesh, pSampled);
 
+
     /**
      * @brief resolution
      */
-    float resolution = atoi(argv[2]);
+    float resolution = atof(argv[2]);
     float res_2 = resolution/2;
 
     octree::OctreePointCloud<PointXYZ>::Ptr pOctreePcl(new octree::OctreePointCloud<PointXYZ>(resolution));
@@ -60,11 +55,15 @@ int main(int argc, char **argv)
 
     vector<PointXYZ, Eigen::aligned_allocator<PointXYZ>> voxelCenters;
     pOctreePcl->getOccupiedVoxelCenters(voxelCenters);
-    pclVis = simpleVis(ptrPcl);
+    PointCloud<PointXYZ>::Ptr pPclVoxels(new PointCloud<PointXYZ>);
 
     for(auto center:voxelCenters){
-        pclVis->addCube(Eigen::Vector3f(center.x, center.y, center.z), Eigen::Quaternionf(1,0,0,0), res, res, res, to_string(rand()));
+        // pclVis->addCube(Eigen::Vector3f(center.x, center.y, center.z), Eigen::Quaternionf(1,0,0,0), res, res, res, to_string(rand()));
+        pPclVoxels->push_back(PointXYZ(center.x, center.y, center.z));
     }
+    pclVis = simpleVis(pPclVoxels);
+    pclVis->addText3D(string("Centroid"), PointXYZ(centroid.x, centroid.y, centroid.z));
+    pclVis->addCube(Eigen::Vector3f(centroid.x, centroid.y, centroid.z), Eigen::Quaternionf(0,0,0,0),1,1,1,"centroid");
 
     while(!pclVis->wasStopped()){
         pclVis->spinOnce(30);
