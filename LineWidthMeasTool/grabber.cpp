@@ -71,12 +71,17 @@ void Grabber::init(AcquisitionModeEnums modeEnum)
 
 void Grabber::start(){
   // TODO: rewrite for single shot
-    if(!pCam->IsInitialized()){
-        this->init();
-    }
+    try {
+        if(!pCam->IsInitialized()){
+            this->init();
+        }
 
-    if(!pCam->IsStreaming()){
-        pCam->BeginAcquisition();
+        if(!pCam->IsStreaming()){
+            pCam->BeginAcquisition();
+        }
+    } catch (Spinnaker::Exception &e) {
+        std::cerr << e.what();
+        throw std::runtime_error("Camera probbably disconnected, please reconnect camera");
     }
 }
 
@@ -107,7 +112,12 @@ ImagePtr Grabber::getResult()
 {
   // size_t width = pResultImage->GetWidth();
   // size_t height = pResultImage->GetHeight();
-  lastResult = pCam->GetNextImage();//->Convert(PixelFormat_Mono8, HQ_LINEAR);
+    try {
+        lastResult = pCam->GetNextImage();//->Convert(PixelFormat_Mono8, HQ_LINEAR);
+    } catch (Spinnaker::Exception &e) {
+        std::cerr << e.what();
+        throw std::runtime_error("Unable to get frame");
+    }
   return lastResult;
 }
 
@@ -142,7 +152,7 @@ void Grabber::free()
             pCam->DeInit();
             pCam = nullptr;
         }
-    }catch(int e){
+    }catch(...){
        // handle exception
     }
     /* if(pSystem != nullptr){

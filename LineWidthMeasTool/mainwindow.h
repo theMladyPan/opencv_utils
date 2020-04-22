@@ -76,6 +76,8 @@ private slots:
 
     void on_sliderFineCalibration_valueChanged(int value);
 
+    void on_spinGridSize_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     stringstream _message;

@@ -10,14 +10,14 @@
     <x>0</x>
     <y>0</y>
     <width>957</width>
-    <height>719</height>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>LineMeasurer</string>
   </property>
   <property name="windowOpacity">
-   <double>1.000000000000000</double>
+   <double>0.500000000000000</double>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
@@ -216,6 +216,19 @@
              </property>
             </widget>
            </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
         </item>
@@ -232,7 +245,7 @@
         <item row="0" column="0">
          <widget class="QFrame" name="frame">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
             <horstretch>3</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -277,6 +290,12 @@
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="title">
               <string>Parameters</string>
              </property>
@@ -308,6 +327,9 @@
                 <property name="minimum">
                  <number>3</number>
                 </property>
+                <property name="maximum">
+                 <number>299</number>
+                </property>
                 <property name="singleStep">
                  <number>2</number>
                 </property>
@@ -323,6 +345,9 @@
                 </property>
                 <property name="minimum">
                  <number>3</number>
+                </property>
+                <property name="maximum">
+                 <number>299</number>
                 </property>
                 <property name="singleStep">
                  <number>2</number>
@@ -369,7 +394,7 @@
               <item>
                <widget class="QSpinBox" name="spinBoxGridSize">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="minimum">
                  <number>50</number>
@@ -383,33 +408,15 @@
                </widget>
               </item>
               <item>
-               <widget class="QDial" name="dialGridSize">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimum">
-                 <number>50</number>
-                </property>
+               <widget class="QSlider" name="spinGridSize">
                 <property name="maximum">
                  <number>1000</number>
                 </property>
-                <property name="singleStep">
+                <property name="value">
                  <number>50</number>
                 </property>
-                <property name="pageStep">
-                 <number>200</number>
-                </property>
-                <property name="invertedAppearance">
-                 <bool>false</bool>
-                </property>
-                <property name="invertedControls">
-                 <bool>false</bool>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
                </widget>
               </item>
@@ -478,6 +485,22 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Expanding</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </item>
@@ -499,7 +522,7 @@
            <item>
             <widget class="QLabel" name="labelImageSetupThreshold">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                <horstretch>6</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -511,6 +534,19 @@
               <set>Qt::AlignCenter</set>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -872,12 +908,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>215</x>
-     <y>229</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>215</x>
-     <y>259</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -888,12 +924,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>270</x>
-     <y>259</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>270</x>
-     <y>229</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -904,12 +940,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>219</x>
-     <y>344</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>219</x>
-     <y>314</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -920,28 +956,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>264</x>
-     <y>314</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>264</x>
-     <y>344</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>dialGridSize</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBoxGridSize</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>190</x>
-     <y>515</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>186</x>
-     <y>409</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -952,12 +972,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>645</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>120</x>
-     <y>627</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -968,12 +988,28 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>621</y>
+     <x>119</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>213</x>
-     <y>648</y>
+     <x>119</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinGridSize</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBoxGridSize</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>119</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>

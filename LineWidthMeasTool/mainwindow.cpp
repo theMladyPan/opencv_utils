@@ -279,10 +279,10 @@ void MainWindow::ApplyThreshold(Mat &outArr)
 
 void MainWindow::ApplyGrid(Mat &outArr, const Scalar color)
 {
-    for(int row=0; row<outArr.rows; row+=ui->dialGridSize->value()){
+    for(int row=0; row<outArr.rows; row+=ui->spinGridSize->value()){
         line(outArr, Point(0,row), Point(outArr.cols, row), color, 2);
     }
-    /*for(int col=0; col<outArr.cols; col+=ui->dialGridSize->value()){
+    /*for(int col=0; col<outArr.cols; col+=ui->spinGridSize->value()){
         line(outArr, Point(col, 0), Point(col, outArr.rows), color, 2);
     }*/
 }
@@ -310,13 +310,22 @@ void MainWindow::getAndUpdateImage()
     }else{
         if(_connected){
             if(_grab){
-                _Grabber.start();
-                _pLastImage = _Grabber.getResult();
-                while(_pLastImage->IsIncomplete()){
-                    _pLastImage = _Grabber.getResult();
+                try {
+                    _Grabber.start();
+                } catch (std::runtime_error &e) {
+                    std::cerr << "Camera disconnected\n" << e.what();
+                    this->on_actionDisconnect_triggered();
                 }
-                toCvArray(_pLastImage).copyTo(*_pLastCvMat);
-                _updateNeeded = true;
+                try {
+                    _pLastImage = _Grabber.getResult();
+                    while(_pLastImage->IsIncomplete()){
+                        _pLastImage = _Grabber.getResult();
+                    }
+                    toCvArray(_pLastImage).copyTo(*_pLastCvMat);
+                    _updateNeeded = true;
+                } catch (std::runtime_error &e) {
+                    std::cerr << e.what();
+                }
             }else{
                 _Grabber.stop();
             }
@@ -413,6 +422,7 @@ void MainWindow::on_actionDisconnect_triggered()
 {
     _Grabber.free();
     _connected = false;
+    _grab = false;
     // on_buttonRefresh_clicked();
 
     showMessage("Disconnected");
@@ -495,4 +505,9 @@ void MainWindow::on_actionReset_triggered()
 void MainWindow::on_sliderFineCalibration_valueChanged(int value)
 {
     _calibrationFine = value / 1000.0;
+}
+
+void MainWindow::on_spinGridSize_valueChanged(int value)
+{
+    value=0;
 }

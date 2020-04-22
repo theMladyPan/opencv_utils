@@ -5,6 +5,7 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+#include <exception>
 
 using namespace Spinnaker;
 using namespace Spinnaker::GenApi;
